@@ -1,0 +1,22 @@
+name: site-metrics-cakephp
+
+project_files:
+  - config.site-metrics-cakephp.yaml
+
+post_install_actions:
+  - #ddev-description:Restart to activate PHP module
+  - ddev restart
+  - #ddev-description:Add required composer packages
+  - ddev composer require open-telemetry/sdk open-telemetry/opentelemetry-auto-cakephp open-telemetry/exporter-otlp --dev -n
+  - ddev composer config allow-plugins.php-http/discovery true -n
+  - #ddev-nodisplay
+    #ddev-description:Set default environment variables
+  - ddev dotenv set .ddev/.env.web --otel-php-autoload-enabled=true > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-service-name=cakephp > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-metric-exporter=none > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-logs-exporter="otlp" > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-php-psr3-mode="export" > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-traces-exporter="otlp" > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-exporter-otlp-endpoint="http://grafana-alloy:4318" > /dev/null 2>&1
+
+ddev_version_constraint: '>= v1.24.3'
