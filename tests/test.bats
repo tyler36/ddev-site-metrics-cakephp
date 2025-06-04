@@ -53,7 +53,7 @@ health_checks() {
 teardown() {
   set -eu -o pipefail
   ddev delete -Oy ${PROJNAME} >/dev/null 2>&1
-  # [ "${TESTDIR}" != "" ] && rm -rf ${TESTDIR}
+  [ "${TESTDIR}" != "" ] && rm -rf ${TESTDIR}
 }
 
 setup_project() {
@@ -105,4 +105,27 @@ install_cakephp() {
   assert_output --partial "HTTP/2 200"
   # Service name is set in `.ddev/.env.web` in `OTEL_SERVICE_NAME`
   ddev logs -s web | \grep --color=auto '"service.name": "cakephp"'
+}
+
+@test "it can collect logs" {
+  set -eu -o pipefail
+
+  setup_project
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+
+  # Restrict otel to only what we need
+  run ddev dotenv set .ddev/.env.web --otel-logs-exporter=console
+  run ddev dotenv set .ddev/.env.web --otel-traces-exporter=none
+  run ddev dotenv set .ddev/.env.web --otel-metric-exporter=none
+  run ddev restart -y
+  assert_success
+
+  # Run a simplified log command.
+  cp "$DIR/tests/testdata/log-demo.php" "${TESTDIR}/log-demo.php"
+  run ddev exec php log-demo.php
+  assert_success
+  assert_output --partial '"body": "Logged from standalone CLI script."'
 }
