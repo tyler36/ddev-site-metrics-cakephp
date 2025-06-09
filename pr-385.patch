@@ -1,0 +1,22 @@
+From c648903a723034b135eaec8af9e741276a36016d Mon Sep 17 00:00:00 2001
+From: tyler36 <7234392+tyler36@users.noreply.github.com>
+Date: Mon, 9 Jun 2025 12:58:35 +0900
+Subject: [PATCH] Fix: Handle null request in CakePHP Server::run hook
+
+---
+ src/Instrumentation/CakePHP/src/Hooks/Cake/Http/Server.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Instrumentation/CakePHP/src/Hooks/Cake/Http/Server.php b/src/Instrumentation/CakePHP/src/Hooks/Cake/Http/Server.php
+index a90fd38c..e62be337 100644
+--- a/src/Instrumentation/CakePHP/src/Hooks/Cake/Http/Server.php
++++ b/src/Instrumentation/CakePHP/src/Hooks/Cake/Http/Server.php
+@@ -26,7 +26,7 @@ public function instrument(): void
+             \Cake\Http\Server::class,
+             'run',
+             pre: function (\Cake\Http\Server $server, array $params, string $class, string $function, ?string $filename, ?int $lineno) {
+-                $request = $params[0];
++                $request = $params[0] ?? null;
+                 assert($request === null || $request instanceof ServerRequestInterface);
+ 
+                 $request = $this->buildSpan($request, $class, $function, $filename, $lineno);

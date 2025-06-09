@@ -2,6 +2,7 @@ name: site-metrics-cakephp
 
 project_files:
   - config.site-metrics-cakephp.yaml
+  - pr-385.patch
   - alloy/otelcol.alloy
 
 post_install_actions:
@@ -12,6 +13,34 @@ post_install_actions:
   - ddev composer require open-telemetry/opentelemetry-auto-pdo open-telemetry/opentelemetry-auto-psr15 open-telemetry/opentelemetry-auto-psr18 --dev -n
   - ddev composer require open-telemetry/opentelemetry-auto-psr3 php-http/guzzle7-adapter --dev -n
   - ddev composer config allow-plugins.php-http/discovery true -n
+  - # Patch opentelemetry-auto-cakephp until #385 is merged
+  -  |
+    # Add patch manager
+    ddev composer config --no-plugins allow-plugins.cweagans/composer-patches true -n
+    ddev composer require cweagans/composer-patches -n
+    # Move patch
+    mkdir -p ../patches/
+    mv pr-385.patch ../patches/
+    # Define the patch JSON
+    PATCH_JSON='
+    {
+      "extra": {
+        "patches": {
+          "open-telemetry/opentelemetry-auto-cakephp": {
+            "Undefined array key 0": "patches/pr-385.patch"
+          }
+        }
+      }
+    }
+    '
+    # Merge the patch into composer.json
+    tmpfile=$(mktemp)
+    cd ..
+    ddev exec jq --argjson patch "$PATCH_JSON" '
+      .extra.patches["open-telemetry/opentelemetry-auto-cakephp"]["Undefined array key 0"] = "patches/pr-385.patch"
+    ' "composer.json" > "$tmpfile" && mv "$tmpfile" "composer.json"
+    echo "Patch added successfully to composer.json."
+    ddev composer install -n
   - #ddev-nodisplay
     #ddev-description:Set default environment variables
   - ddev dotenv set .ddev/.env.web --otel-php-autoload-enabled=true > /dev/null 2>&1
