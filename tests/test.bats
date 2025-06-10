@@ -92,8 +92,9 @@ install_cakephp() {
 
   # Restrict otel to only what we need
   run ddev dotenv set .ddev/.env.web --otel-logs-exporter=none
-  run ddev dotenv set .ddev/.env.web --otel-traces-exporter=otpl
+  run ddev dotenv set .ddev/.env.web --otel-traces-exporter=console
   run ddev dotenv set .ddev/.env.web --otel-metric-exporter=none
+  run ddev dotenv set .ddev/.env.web --otel-log-level=debug
   run ddev restart -y
   assert_success
 
