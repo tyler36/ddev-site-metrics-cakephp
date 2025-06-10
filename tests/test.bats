@@ -191,6 +191,8 @@ install_cakephp() {
   cp "$DIR/tests/testdata/log-demo.php" "${TESTDIR}/log-demo.php"
   run ddev exec php log-demo.php
   assert_success
+  # Wait for an arbitrary amount of time for the trace to propagate.
+  sleep 15
 
   # Grafana Loki uses Trace discovery through logs
   run ddev exec curl -s "${LOKI_SERVER}/loki/api/v1/query" --data-urlencode 'query=sum(rate({service_name="cakephp"}[1m])) by (level)'
