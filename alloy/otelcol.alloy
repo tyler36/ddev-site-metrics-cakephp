@@ -1,0 +1,59 @@
+// ##ddev-generated
+
+/**
+ * 'otelcol.receiver.otlp' accepts OTLP-formatted data over the network and forwards it to other otelcol.* components.
+ * @See https://grafana.com/docs/alloy/latest/reference/components/otelcol/otelcol.receiver.otlp/
+ */
+otelcol.receiver.otlp "default" {
+  http {
+    endpoint="grafana-alloy:4318"
+  }
+
+  output {
+    logs = [otelcol.processor.batch.default.input]
+    metrics = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+/**
+ * 'otelcol.processor.batch' accepts telemetry data from other otelcol components and places them into batches.
+ * @See https://grafana.com/docs/alloy/latest/reference/components/otelcol/otelcol.processor.batch/
+ */
+otelcol.processor.batch "default" {
+  output {
+    logs = [otelcol.exporter.loki.default.input]
+    metrics = [otelcol.exporter.prometheus.default.input]
+    traces  = [otelcol.exporter.otlphttp.tempo.input]
+  }
+}
+
+/**
+ * 'otelcol.exporter.prometheus' accepts OTLP-formatted metrics from other otelcol components, converts metrics to Prometheus-formatted metrics, and forwards the resulting metrics to prometheus components.
+ * @See https://grafana.com/docs/alloy/latest/reference/components/otelcol/otelcol.exporter.prometheus/
+ */
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.default.receiver]
+}
+
+/**
+ * 'otelcol.exporter.loki' accepts OTLP-formatted logs from other otelcol components, converts them to Loki-formatted log entries, and forwards them to loki components.
+ * @See https://grafana.com/docs/alloy/latest/reference/components/otelcol/otelcol.exporter.loki/
+ */
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.default.receiver]
+}
+
+/**
+ * 'telcol.exporter.otlphttp' accepts telemetry data from other otelcol components and writes them over the network using the OTLP HTTP protocol.
+ * @See https://grafana.com/docs/alloy/latest/reference/components/otelcol/otelcol.exporter.otlphttp/
+ */
+otelcol.exporter.otlphttp "tempo" {
+    client {
+        endpoint = "http://grafana-tempo:4318"
+        tls {
+            insecure             = true
+            insecure_skip_verify = true
+        }
+    }
+}
