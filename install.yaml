@@ -2,6 +2,7 @@ name: site-metrics-cakephp
 
 project_files:
   - config.site-metrics-cakephp.yaml
+  - alloy/otelcol.alloy
 
 post_install_actions:
   - #ddev-description:Restart to activate PHP module
