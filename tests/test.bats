@@ -108,6 +108,40 @@ install_cakephp() {
   ddev logs -s web | \grep --color=auto '"service.name": "cakephp"'
 }
 
+@test "it can collect traces via OTEL" {
+  set -eu -o pipefail
+
+  setup_project
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+
+  # Restrict otel to only what we need
+  run ddev dotenv set .ddev/.env.web --otel-logs-exporter=none
+  run ddev dotenv set .ddev/.env.web --otel-traces-exporter=otlp
+  run ddev dotenv set .ddev/.env.web --otel-metric-exporter=none
+  run ddev restart -y
+  assert_success
+
+  # Check that there are no traces currently stored
+  run ddev exec curl -G -s grafana-tempo:3200/api/search
+  assert_success
+  assert_output --partial '"traces":[]'
+
+  # Access the site to trigger a trace.
+  run curl -sfI https://${PROJNAME}.ddev.site
+  assert_output --partial "HTTP/2 200"
+  assert_success
+  # Wait for an arbitrary amount of time for the trace to propagate.
+  sleep 15
+
+  # Grafana Loki uses Trace discovery through logs
+  run ddev exec curl -G -s grafana-tempo:3200/api/search
+  assert_success
+  assert_output --partial '"rootServiceName":"cakephp"'
+}
+
 @test "it can collect logs" {
   set -eu -o pipefail
 
