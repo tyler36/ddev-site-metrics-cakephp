@@ -1,0 +1,7 @@
+##ddev-generated
+services:
+  # Map the default CakePHP logs folder into Grafana Alloy.
+  # Then we use 'alloy/cakephp-logs.alloy' to parse the file and send it for processing.
+  grafana-alloy:
+    volumes:
+      - ../logs/:/var/log/cakephp

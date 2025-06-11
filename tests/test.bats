@@ -196,3 +196,36 @@ install_cakephp() {
   assert_success
   assert_output --partial '"totalEntriesReturned":1'
 }
+
+@test "it can collect logs via local CakePHP log files" {
+  set -eu -o pipefail
+
+  setup_project
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+
+  # Restrict otel to only what we need
+  run ddev dotenv set .ddev/.env.web --otel-logs-exporter=otlp
+  run ddev dotenv set .ddev/.env.web --otel-traces-exporter=none
+  run ddev dotenv set .ddev/.env.web --otel-metric-exporter=none
+  run ddev restart -y
+  assert_success
+
+  # Grafana Loki uses Trace discovery through logs
+  export LOKI_SERVER="http://grafana-loki:3100"
+  run ddev exec curl -s "${LOKI_SERVER}/loki/api/v1/query" --data-urlencode 'query=sum(rate({service_name="cakephp"}[1m])) by (level)'
+  assert_success
+  assert_output --partial '"totalEntriesReturned":0'
+
+  # Write a log entry
+  echo "2024-06-10 09:19:32 info: This was forced." > logs/debug.log
+  # Wait for an arbitrary amount of time for the log to propagate.
+  sleep 15
+
+  # Grafana Loki uses Trace discovery through logs
+  run ddev exec curl -s "${LOKI_SERVER}/loki/api/v1/query" --data-urlencode 'query=sum(rate({service_name="cakephp_logs"}[1m])) by (level)'
+  assert_success
+  assert_output --partial '"totalEntriesReturned":1'
+}

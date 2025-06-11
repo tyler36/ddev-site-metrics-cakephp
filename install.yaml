@@ -2,6 +2,8 @@ name: site-metrics-cakephp
 
 project_files:
   - config.site-metrics-cakephp.yaml
+  - docker-compose.cakephp-logs.yaml
+  - alloy/cakephp-logs.alloy
   - alloy/otelcol.alloy
 
 post_install_actions:
