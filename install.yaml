@@ -2,9 +2,22 @@ name: site-metrics-cakephp
 
 project_files:
   - config.site-metrics-cakephp.yaml
+  - docker-compose.cakephp-logs.yaml
+  - alloy/cakephp-logs.alloy
   - alloy/otelcol.alloy
 
 post_install_actions:
+  -  #ddev-description:Remove log bind if 'site-metrics' is not installed
+  - |
+    if grep -q '#ddev-generated' docker-compose.cakephp-logs.yaml; then
+      if (ddev addon list --installed | grep -q " site-metrics "); then
+        echo "Found 'site-metrics' addon so no cleanup required."
+      else
+        echo "We didn't find 'ddev-site-metrics' so we're not sure if you have the 'alloy' service install."
+        echo "We'll remove the file to prevent a startup error."
+        rm docker-compose.cakephp-logs.yaml
+      fi
+    fi
   - #ddev-description:Restart to activate PHP module
   - ddev restart
   - #ddev-description:Add required composer packages
