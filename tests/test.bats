@@ -200,7 +200,8 @@ install_cakephp() {
 @test "it can collect logs via local CakePHP log files" {
   set -eu -o pipefail
 
-  setup_project
+  install_cakephp
+  ddev addon get tyler36/ddev-site-metrics
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
