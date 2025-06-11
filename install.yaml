@@ -7,6 +7,11 @@ project_files:
   - alloy/otelcol.alloy
 
 post_install_actions:
+  - #ddev-description:Remove log bind if 'site-metrics' is not installed
+  - |
+    if ddev addon list --installed | grep -v ' site-metrics ' && grep -q '#ddev-generated' docker-compose.cakephp-logs.yaml; then
+      rm docker-compose.cakephp-logs.yaml
+    fi
   - #ddev-description:Restart to activate PHP module
   - ddev restart
   - #ddev-description:Add required composer packages
