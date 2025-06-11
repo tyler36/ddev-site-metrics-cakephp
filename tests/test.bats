@@ -56,11 +56,6 @@ teardown() {
   [ "${TESTDIR}" != "" ] && rm -rf ${TESTDIR}
 }
 
-setup_project() {
-  install_cakephp
-  ddev addon get tyler36/ddev-site-metrics
-}
-
 install_cakephp() {
   ddev config --project-type=cakephp --docroot=webroot
   ddev start
@@ -70,7 +65,7 @@ install_cakephp() {
 @test "install from directory" {
   set -eu -o pipefail
 
-  setup_project
+  install_cakephp
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
@@ -84,7 +79,7 @@ install_cakephp() {
 @test "it can collect traces" {
   set -eu -o pipefail
 
-  setup_project
+  install_cakephp
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
@@ -111,7 +106,8 @@ install_cakephp() {
 @test "it can collect traces via OTEL" {
   set -eu -o pipefail
 
-  setup_project
+  install_cakephp
+  ddev addon get tyler36/ddev-site-metrics
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
@@ -145,7 +141,7 @@ install_cakephp() {
 @test "it can collect logs" {
   set -eu -o pipefail
 
-  setup_project
+  install_cakephp
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
@@ -168,7 +164,8 @@ install_cakephp() {
 @test "it can collect logs via OTEL" {
   set -eu -o pipefail
 
-  setup_project
+  install_cakephp
+  ddev addon get tyler36/ddev-site-metrics
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
