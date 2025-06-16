@@ -18,8 +18,15 @@ post_install_actions:
         rm docker-compose.cakephp-logs.yaml
       fi
     fi
-  - #ddev-description:Restart to activate PHP module
-  - ddev restart
+  - #ddev-description:Restart to activate PHP module, if required
+  - |
+    echo "Checking for PHP telemetry ..."
+    if ddev php --ri opentelemetry | grep -q "hooks => enabled"; then
+      echo "✅ PHP telemetry active"
+    else
+      echo "❌ PHP telemetry NOT active. Restarting to apply."
+      ddev restart
+    fi
   - #ddev-description:Add required composer packages
   - ddev composer require open-telemetry/sdk open-telemetry/opentelemetry-auto-cakephp open-telemetry/exporter-otlp --dev -n
   - ddev composer require open-telemetry/opentelemetry-auto-pdo open-telemetry/opentelemetry-auto-psr15 open-telemetry/opentelemetry-auto-psr18 --dev -n
