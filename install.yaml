@@ -21,7 +21,7 @@ post_install_actions:
   - #ddev-description:Restart to activate PHP module
   - ddev restart
   - #ddev-description:Add required composer packages
-  - ddev composer require open-telemetry/sdk open-telemetry/opentelemetry-auto-cakephp open-telemetry/exporter-otlp --dev -n
+  - ddev composer require open-telemetry/sdk open-telemetry/opentelemetry-auto-cakephp open-telemetry/api open-telemetry/exporter-otlp --dev -n
   - ddev composer require open-telemetry/opentelemetry-auto-pdo open-telemetry/opentelemetry-auto-psr15 open-telemetry/opentelemetry-auto-psr18 --dev -n
   - ddev composer require open-telemetry/opentelemetry-auto-psr3 php-http/guzzle7-adapter --dev -n
   - ddev composer config allow-plugins.php-http/discovery true -n
