@@ -45,7 +45,7 @@ OTEL_PHP_AUTOLOAD_ENABLED="false"
 
 ```conf
 OTEL_TRACES_EXPORTER="otlp"
-OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-alloy:4318
+OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-alloy:4317
 ```
 
 ## Configuration

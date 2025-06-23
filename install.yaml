@@ -28,7 +28,7 @@ post_install_actions:
       ddev restart
     fi
   - #ddev-description:Add required composer packages
-  - ddev composer require open-telemetry/sdk open-telemetry/opentelemetry-auto-cakephp open-telemetry/exporter-otlp --dev -n
+  - ddev composer require open-telemetry/sdk open-telemetry/opentelemetry-auto-cakephp open-telemetry/exporter-otlp open-telemetry/transport-grpc --dev -n
   - ddev composer require open-telemetry/opentelemetry-auto-pdo open-telemetry/opentelemetry-auto-psr15 open-telemetry/opentelemetry-auto-psr18 --dev -n
   - ddev composer require open-telemetry/opentelemetry-auto-psr3 php-http/guzzle7-adapter --dev -n
   - ddev composer config allow-plugins.php-http/discovery true -n
@@ -40,6 +40,7 @@ post_install_actions:
   - ddev dotenv set .ddev/.env.web --otel-logs-exporter="otlp" > /dev/null 2>&1
   - ddev dotenv set .ddev/.env.web --otel-php-psr3-mode="export" > /dev/null 2>&1
   - ddev dotenv set .ddev/.env.web --otel-traces-exporter="otlp" > /dev/null 2>&1
-  - ddev dotenv set .ddev/.env.web --otel-exporter-otlp-endpoint="http://grafana-alloy:4318" > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-exporter-otlp-endpoint="http://grafana-alloy:4317" > /dev/null 2>&1
+  - ddev dotenv set .ddev/.env.web --otel-exporter-otlp-protocol="grpc" > /dev/null 2>&1
 
 ddev_version_constraint: '>= v1.24.3'
