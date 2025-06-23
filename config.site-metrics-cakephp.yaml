@@ -1,2 +1,2 @@
 ##ddev-generated
-webimage_extra_packages: ["php${DDEV_PHP_VERSION}-opentelemetry"]
+webimage_extra_packages: ["php${DDEV_PHP_VERSION}-opentelemetry", "php${DDEV_PHP_VERSION}-grpc"]
