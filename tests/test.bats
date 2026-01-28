@@ -45,8 +45,8 @@ health_checks() {
   run ddev dotenv get .ddev/.env.web --otel-php-autoload-enabled
   assert_output true
 
-  # It writes traces
-  run curl -sfI https://${PROJNAME}.ddev.site
+  # The site is available
+  run curl -sfIk https://${PROJNAME}.ddev.site
   assert_output --partial "HTTP/2 200"
 }
 
@@ -97,7 +97,7 @@ install_cakephp() {
   assert_success
 
   # Ensure traces appear in logs
-  run curl -sfI https://${PROJNAME}.ddev.site
+  run curl -sfIk https://${PROJNAME}.ddev.site
   assert_output --partial "HTTP/2 200"
   # Service name is set in `.ddev/.env.web` in `OTEL_SERVICE_NAME`
   ddev logs -s web | \grep --color=auto '"service.name": "cakephp"'
