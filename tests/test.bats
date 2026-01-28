@@ -45,7 +45,7 @@ health_checks() {
   run ddev dotenv get .ddev/.env.web --otel-php-autoload-enabled
   assert_output true
 
-  # It writes traces
+  # The site is available
   run curl -sfIk https://${PROJNAME}.ddev.site
   assert_output --partial "HTTP/2 200"
 }
